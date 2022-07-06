@@ -76,8 +76,8 @@ let
         for f in Setup.hs Setup.lhs; do
           if [ -f $f ]; then
             echo Compiling package $f
-            ghc $f -threaded '' + (if includeGhcPackage then "-package ghc " else "")
-                + ''-package-db ${configFiles}/${configFiles.packageCfgDir} --make -o ./Setup
+            ghc $f -threaded ${if includeGhcPackage then "-package ghc " else ""
+                }-package-db ${configFiles}/${configFiles.packageCfgDir} --make -o ./Setup
             setup=$(pwd)/Setup
           fi
         done
@@ -89,6 +89,7 @@ let
         runHook preInstall
         mkdir -p $out/bin
         install ./Setup $out/bin/Setup
+        $out/bin/Setup --version || (echo Setup --version fails && exit 1)
         runHook postInstall
       '';
     }
